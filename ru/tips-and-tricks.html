@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VerMishelb's stash</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link href="/style.css" rel="stylesheet" type="text/css" media="all">
+  </head>
+  
+  <body>
+    <h1>VerMishelb's stash</h1>
+    <p>
+      <a href="./index.html"><strong>На главную</strong></a>
+    </p>
+    <h2>Заметки</h2>
+    <p>
+      This is a collection of tips, tricks and other PC-related stuff that I have collected over the years of using Windows versions 7 through 11. Some of it used to be in a text file I had on my local drive but this drive is long gone. This time I am storing this online so it doesn't disappear into the void.
+    </p>
+    <h3>Значения в реестре</h3>
+<pre class="proglist"><code>Windows Registry Editor Version 5.00  
+
+;Turn off automatic folder mode adjustment thing to speed the explorer up
+[-HKCU\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\Bags]
+[-HKCU\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\BagMRU]
+[HKCU\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\Bags\AllFolders\Shell]
+"FolderType"="NotSpecified"
+
+;Local account creation in Windows 11. Use Shift-F10 to open CMD on OOBE screen and call 'regedit' there. If the CMD doesn't show up, kill Secure Boot and try again.
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\OOBE]
+"BypassNRO"=dword:00000001
+
+;Treat the BIOS time as UTC instead of local time. Helps if there's a Linux installation as an extra system and the clock breaks on both systems after every switch.
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\TimeZoneInformation]
+"RealTimeIsUniversal"=dword:00000001</code></pre>
+    
+    <h3>Alt-коды</h3>
+    <p>Большая часть работает на любой раскладке, но некоторые зависят от неё.</p>
+    <!-- Whoever came up with this way of setting tables up should be crucified... -->
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Символ</th>
+          <th scope="col">Alt-код</th>
+          <th scope="col">Alt-юникод</th>
+          <th scope="col">Название</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr>
+          <td>—; –</th>
+          <td>0151; 0150</th>
+          <td>-</th>
+          <td>Em dash; En dash</th>
+        </tr>
+        <tr>
+          <td>↑↓→←</th>
+          <td>24 25 26 27</th>
+          <td>-</th>
+          <td>Arrows</th>
+        </tr>
+        <tr>
+          <td>™; © ®</th>
+          <td>0153; 0169; 0174</th>
+          <td>-</th>
+          <td>-</th>
+        </tr>
+        <tr>
+          <td> </th>
+          <td>0160/255</th>
+          <td>-</th>
+          <td>non-breaking space</th>
+        </tr>
+        <tr>
+          <td> ́</th>
+          <td>769 (don't)</th>
+          <td>+301</th>
+          <td>Combing acute accent mark. In MS Word there's 0301 → Alt-X</th>
+        </tr>
+        <tr>
+          <td>█</th>
+          <td>987</th>
+          <td>-</th>
+          <td>Block (good for [DATA REMOVED] kind of stuff)</th>
+        </tr>
+        <tr>
+          <td>•</th>
+          <td>0149</th>
+          <td>-</th>
+          <td>Bullet point</th>
+        </tr>
+        <tr>
+          <td>°</th>
+          <td>0176 (US layout)</th>
+          <td>+B0</th>
+          <td>Degree sign</th>
+        </tr>
+        <tr>
+          <td>±²³</th>
+          <td>0177-0179</th>
+          <td>-</th>
+          <td>-</th>
+        </tr>
+        <tr>
+          <td>§; ¶</th>
+          <td>0167/21; 0182</th>
+          <td>-</th>
+          <td>Paragraph sign, carret return</th>
+        </tr>
+        <tr>
+          <td>·</th>
+          <td>0183</th>
+          <td>-</th>
+          <td>Multiplication point</th>
+        </tr>
+        <tr>
+          <td>«»</th>
+          <td>0171 0187</th>
+          <td>-</th>
+          <td>Кавычки-ёлочки (основные в русском языке)</th>
+        </tr>
+        <tr>
+          <td>„“ “”</th>
+          <td>0132 0147 0148</th>
+          <td>-</th>
+          <td>немецкие кавычки-«лапки» (вложенные и в рукописном)</th>
+        </tr>
+        <tr>
+          <td>‘’</th>
+          <td>0145 0146</th>
+          <td>-</th>
+          <td>английские одиночные (перевод иноязычного слова)</th>
+        </tr>
+      </tbody>
+    </table>
+    
+    <h3>Компьютер не может уснуть, просыпается на ровном месте</h3>
+    <p>
+    Go to your power management settings, the ones from Windows Vista (use Win-R and type "control" to bring up the old control panel) and modify your active power plan to disable "wake-up on event timers" or some option of that kind. Optionally, you can turn off "Wake-on-LAN" and "Wake on magic packet" to prevent the wake-ups from the network adapter. Do this through the adapter options in the device manager.
+    </p>
+    
+    <h3>Сброс кэша иконок</h3>
+    <p>
+      Есть два типа кэша — IconCache и ThumbCache. Первый для обычных иконок, вроде приложений и папок. Второй для предпросмотра видео и изображений. Обычно ломается первый. Поместите следующий код в .bat файл и выполните от имени администратора.
+    </p>
+<pre class="proglist"><code>taskkill /f /im explorer.exe
+cd /d %localappdata%\Microsoft\Windows\Explorer
+rem This command removes (-) the "Hidden" attribute (h) of the file.
+attrib -h iconcache_*.db
+del /f IconCache*
+rem Remove "rem" from the following if you want to reset image previews as well.
+rem del /f ThumbCache*
+cd /d %localappdata%
+attrib -h IconCache.db
+del /f IconCache.db
+start explorer.exe</code></pre>
+
+    <h3>Поддержка JPEG-XL на Windows 10</h3>
+    <p>
+    Используйте <a href="https://github.com/saschanaz/jxl-winthumb">вот эту крутую штуку</a>. Инструкция довольно простая, но, на случай, если она пропадёт, просто вызовите regsvr32 с тамошней .dll от имени администратора.
+    </p>
+
+<br><br><br>
+    <h2>Linux</h2>
+    <h3>Скрипт для обновления Discord в Debian</h3>
+    Arch has automatic Discord updates but Debian doesn't, for some reason. Therefore I use this small script to update it every time this annoying "Download .deb" screen pops up. Stackoverflow says it's a bad way of doing this but it also never says <italic>why</italic>, so until this is disclosed I guess we're fine. You can't run this script by double-clicking it, but you can run it from the terminal just fine.
+<pre class="proglist"><code>#! /usr/bin/bash
+discord_url="https://discord.com/api/download/stable?platform=linux&amp;format=deb"
+curl -L -o /tmp/discord.deb $discord_url
+sudo apt install /tmp/discord.deb</code></pre>
+
+    <h3>МФУ / сканер Canon, scangearmp2, firewalld и соединение по WiFi</h3>
+    <p>
+      По умолчанию firewalld использует зону «public» для всех сетей, и эта зона блокирует все входящие и исходящие соединения, если не прописано иначе.
+      МФУ Canon использует уйму UDP портов в диапазоне 20000-61000, поэтому добавлять их в белый список вручную сложно. Чтобы заставить сканер работать по сети,
+      достаточно добавить MAC-адрес сканера в источники зоны «trusted». В этом случае сканер получает полный доступ к взаимодействию с ПК. Лучше делать это через
+      firewall-config, потому что встроенная штука для управления брандмауэром в KDE не работает с firewalld от слова совсем.
+    </p>
+
+
+
+    <footer>
+      <div style="text-align: center;">
+          <small>
+              © 2025 VerMishelb.
+          </small>
+      </div>
+    </footer>
+    <!-- This is necessary because the mobile version of Firefox CANNOT EVEN SCROLL HERE for some reason. -->
+    <br>
+  </body>
+</html>

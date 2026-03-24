@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VerMishelb's stash</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link href="/style.css" rel="stylesheet" type="text/css" media="all">
+  </head>
+  
+  <body>
+    <h1>VerMishelb's stash</h1>
+    <p>
+      <a href="./index.html"><strong>Home page</strong></a>
+    </p>
+    <h2>Tips & tricks</h2>
+    <p>
+      This is a collection of tips, tricks and other PC-related stuff that I have collected over the years of using Windows versions 7 through 11. Some of it used to be in a text file I had on my local drive but this drive is long gone. This time I am storing this online so it doesn't disappear into the void.
+    </p>
+    <h3>Registry values</h3>
+<pre><code>Windows Registry Editor Version 5.00  
+
+;Turn off automatic folder mode adjustment thing to speed the explorer up
+[-HKCU\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\Bags]
+[-HKCU\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\BagMRU]
+[HKCU\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\Bags\AllFolders\Shell]
+"FolderType"="NotSpecified"
+
+;Local account creation in Windows 11. Use Shift-F10 to open CMD on OOBE screen and call 'regedit' there. If the CMD doesn't show up, kill Secure Boot and try again.
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\OOBE]
+"BypassNRO"=dword:00000001
+
+;Treat the BIOS time as UTC instead of local time. Helps if there's a Linux installation as an extra system and the clock breaks on both systems after every switch.
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\TimeZoneInformation]
+"RealTimeIsUniversal"=dword:00000001</code></pre>
+    
+    <h3>Alt codes</h3>
+    <p>
+    These mostly work on any keyboard layout, but some might be depending on it.<br>
+    —; – | 0151; 0150 | Em dash; En dash<br>
+    ↑↓→← | 24 25 26 27<br>
+    ™; © | 0153; 0169<br>
+      | 0160/255 | non-breaking space<br>
+    accent mark | 769 [doesn't work everywhere, and in word there's 0301 → Alt-X combo that is more universal]<br>
+    █ | 987<br>
+    • | 0149<br>
+    ° | 0176 eng | Degree sign
+    ±²³ | 0177-0179<br>
+    §; ¶ | 0167/21; 0182 | Paragraph sign, carret return<br>
+    · | 0183<br>
+    </p>
+    
+    <h3>The computer can't go to sleep, wakes up on a whim</h3>
+    <p>
+    Go to your power management settings, the ones from Windows Vista (use Win-R and type "control" to bring up the old control panel) and modify your active power plan to disable "wake-up on event timers" or some option of that kind. Optionally, you can turn off "Wake-on-LAN" and "Wake on magic packet" to prevent the wake-ups from the network adapter. Do this through the adapter options in the device manager.
+    </p>
+    
+    <h3>Reset icon cache</h3>
+    <p>
+      There are two types of cache — IconCache and ThumbCache. The former is for regular icons, like apps and folders. The latter is for previews for videos, images and so on. Usually it's the former one that is broken. Put the following into a .bat file and execute it as administrator.
+    </p>
+<pre><code>taskkill /f /im explorer.exe
+cd /d %localappdata%\Microsoft\Windows\Explorer
+rem This command removes (-) the "Hidden" attribute (h) of the file.
+attrib -h iconcache_*.db
+del /f IconCache*
+rem Remove "rem" from the following if you want to reset image previews as well.
+rem del /f ThumbCache*
+cd /d %localappdata%
+attrib -h IconCache.db
+del /f IconCache.db
+start explorer.exe</code></pre>
+
+    <h3>JPEG-XL support on Windows 10</h3>
+    <p>
+    Use <a href="https://github.com/saschanaz/jxl-winthumb">this epic thing</a>. The instructions are simple enough, but in case they are gone somehow, just call a regsvr32 on it as Admin.
+    </p>
+
+<br><br><br>
+    <h2>Linux</h2>
+    <h3>Discord update script for Debian</h3>
+    Arch has automatic Discord updates but Debian doesn't, for some reason. Therefore I use this small script to update it every time this annoying "Download .deb" screen pops up. Stackoverflow says it's a bad way of doing this but it also never says <italic>why</italic>, so until this is disclosed I guess we're fine. You can't run this script by double-clicking it, but you can run it from the terminal just fine.
+<pre><code>#! /usr/bin/bash
+discord_url="https://discord.com/api/download/stable?platform=linux&amp;format=deb"
+curl -L -o /tmp/discord.deb $discord_url
+sudo apt install /tmp/discord.deb</code></pre>
+
+
+
+    <footer>
+      <div style="text-align: center;">
+          <small>
+              © 2025 VerMishelb.
+          </small>
+      </div>
+    </footer>
+    <!-- This is necessary because the mobile version of Firefox CANNOT EVEN SCROLL HERE for some reason. -->
+    <br><br><br>
+  </body>
+</html>

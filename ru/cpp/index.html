@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C++ | VerMishelb's stash</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link href="/style.css" rel="stylesheet" type="text/css" media="all">
+  </head>
+  <body>
+    <h1>VerMishelb's stash</h1>
+    <p><a href="/ru/index.html"><strong>На главную</strong></a></p>
+
+    <h2>C++ и как его варить</h2>
+    <p>
+      На этой странице несколько разделов, все расположены по порядку, в котором их, по моему мнению, удобно изучать. На момент написания первой версии этого документа
+      последний принятый стандарт — C++23, а последняя версия CMake — 4.0.3 (у Debian всё ещё 3.31, но различий там не то чтобы много...)
+    </p>
+
+    <h3>Содержание</h3>
+    <nav>
+      <ol>
+        <li><a href="#workspace-setup">Настройка рабочей среды</a>
+          <ul>
+            <li><a href="#workspace-setup_ide">IDE / редактор кода</a></li>
+            <li><a href="#workspace-setup_vsc-extensions">Расширения для VSCode</a></li>
+            <li><a href="#workspace-setup_compiler">Компилятор</a></li>
+            <li><a href="#workspace-setup_bs">Сборка проекта и её автоматизация</a></li>
+            <li><a href="#workspace-setup_cmake">CMake</a></li>
+          </ul>
+        </li>
+        <li><a href="#first-program">Первая программа (Hello World без std::cout)</a></li>
+      </ol>
+    </nav>
+    <h2 id="workspace-setup">Настройка рабочей среды</h2>
+    <h3 id="workspace-setup_ide">IDE / редактор кода</h3>
+    <p>
+      Каждый использует то, что ему удобнее.
+      Что под Windows, что под Linux можно использовать комплект из Visual Studio Code в качестве
+      перередактора недо-IDE да CMake в качестве системы сборки (точнее, системы сборки <i>для</i> системы сборки, которая будет зависеть от операционной системы).
+      VSC прекрасно работает на обеих системах, терпимо работает на слабых устройствах (я написал свой диплом на Fujitsu Lifebook UH552 и выжил).
+    </p>
+    <p>
+      Тем не менее, если вас понесёт в обычную Visual Studio, то следует учесть, что она не знает, что такое UTF-8.
+      Чтобы VS нормально сохраняла ваши исходники, нужно в корне папки с проектом положить небольшой текстовый файлик с 
+      именем <code>.editorconfig</code> (без расширения <code>.txt</code>) со следующим содержимым:
+    </p>
+    <p></p>
+<pre class="proglist"><i><b><u>«.editorconfig»</u></b></i>
+root = true
+
+[*]
+
+charset = utf-8</pre>
+    <p>
+      Данный файл попросит VS сохранять и создавать вообще все файлы в UTF-8. Вряд ли через 10 лет появится что-то, что способно заменить UTF-8 в универсальности.
+    </p>
+    <p>«А зачем это, собственно, нужно?», спросите вы. А у вас в коде будет Кириллица? Другие языки? Рано или поздно будет и то, и другое. Взять, хотя бы, вывод путей к файлам в программе.
+      И первое, что сделает Windows — превратит вашу Кириллицу в Windows-1251. Код не перенесёт таких издёвок. Как только вы поймёте, что у вас проблемы с выводом,
+      начнётся увлекательное путешествие в недры интернета, где вопросы на stackoverflow от 2009-го остаются без конкретного ответа, потому что нормального способа это решить так и не придумали.
+    </p>
+    <p>К счастью, бо́льшая часть этого решается C++23.</p>
+
+
+
+    <h3 id="workspace-setup_vsc-extensions">Расширения для VSCode</h3>
+    <p>
+      Нам нужны следующие:
+      <ul>
+        <li>C/C++ <i>от Microsoft</i> — нужно <b>обязательно</b>. Поддержка языка.</li>
+        <li>C/C++ Themes <i>от Microsoft [Опционально]</i> — цветовые темы для подсветки синтаксиса.</li>
+        <li>CMake IntelliSen<b>c</b>e <i>от Kylin-IDE Team</i> — в отличие от других расширений для синтаксиса CMake, это работает как часы и регулярно обновляется. В названии есть опечатка.</li>
+        <li>CMake Tools <i>от Microsoft</i> — если нужно, чтобы VSC видела проекты с CMake правильно (нам нужно).</li>
+      </ul>
+    </p>
+
+
+
+    <h3 id="workspace-setup_compiler">Компилятор</h3>
+    <p>
+      Здесь простор для творчества!<br>
+      На Windows можно поставить <a href="https://visualstudio.microsoft.com/ru/downloads/#build-tools-for-visual-studio-2022">Visual Studio Build Tools</a>, либо
+      саму Visual Studio, т.к. Build Tools — её компонент. Компилятор Microsoft сокращают до MSVC (Microsoft Visual C++).<br>
+      Кроме него есть <b>GCC</b> (GNU Compiler Collection), который только для Linux. Для винды есть порт MinGW, он же в <a href="https://www.msys2.org/">MSYS2</a>,
+      он же в <a href="https://cygwin.com/">Cygwin</a>. Если не MSVC, то ваш выбор скорее всего падёт на MSYS2. 
+      Установка, правда, страшная.<br>Ещё есть <a href="https://clang.llvm.org/">Clang</a>. Он есть.
+      Больше я о нём ничего сказать не могу, потому что не приходилось использовать.
+    </p>
+    <p>
+      Установка MSVC — прощёлкивание «Далее» несколько раз. Установка GCC на Linux — <code>apt install gcc</code>, или <code>pacman -Syu gcc</code>, или ещё как-нибудь похоже, исходя из вашего пакетного менеджера.
+      Установка пакета gcc должна установить g++ — сам компилятор для C++.
+    </p>
+
+
+
+    <h3 id="workspace-setup_bs">Сборка и её автоматизация</h3>
+    <p>
+      Компилятор превращает рукописи в исполняемый код, но его придётся вызывать вручную. Допустим, у вас всего один файл кода «main.cpp». Тогда для сборки через GCC вам всего лишь нужно написать в консоль:
+<pre class="proglist">$ g++ main.cpp -o main.elf</pre>
+      Теперь вы можете вызвать ./main.elf из терминала и получить вывод вашей программы. Здорово? Здорово.<br>
+      .elf здесь не просто потому что я так решил, а потому что так называется <a href="https://ru.wikipedia.org/wiki/Executable_and_Linkable_Format">формат исполняемых файлов в Unix</a>.
+      Это легко проверить, если вызвать на него <code>$ file</code>. Я был сильно удивлён, когда собрал программу по привычке с расширением (моя основная система — Windows 10), а позже
+      получил вопрос от пользователя Linux про то, что значит такое расширение.
+    </p>
+    <p>
+      А теперь представьте, что у вас десяток таких файлов с кодом. Может быть, вы делаете игру? Тогда вам понадобятся сторонние библиотеки, а их тоже нужно собирать! Команда сборки превращается в стену текста:
+<pre class="proglist">$ g++ -o "epic game.elf" main.cpp Entity.cpp Collision.cpp Window.cpp &lt;и так далее&gt;</pre>
+    Как быть? Нужно автоматизировать это дело. В Visual Studio за нас это делает сама ИСР (видели когда-нибудь аббревиатуру IDE на русском?). Без IDE нужно страдать. Самое просто решение — скрипты.
+    Можно автоматизировать сборку с помощью bat или sh скриптов, в зависимости от ОС, и многие старые проекты спокойно с этим работают. Такое решение крайне ограничено в функционале, а ошибка в скрипте
+    может привести к концу света. Тогда люди решили, что конец света им не нужен, и придумали Makefile. Теперь у них две проблемы.
+    </p>
+    <p>
+
+<pre class="proglist"><i><b><u>«/project/Makefile»</u></b></i>
+all:
+    g++ main.cpp Entity.cpp Collision.cpp ... -o "epic game.elf"
+clean:
+    rm -rf *.o "epic game.elf"</pre>
+    Структура данного файла предельно проста, и в этом заключается главная сложность. В первой строчке указывается «цель» (all) и её зависимости после двоеточия, т.е. цели, которые должны быть
+    выполнены до сборки выбранной цели. Следом, с табуляцией, идёт сама команда. Обратите внимание на пробел в названии выходного файла «epic game.elf».
+    Огромное (ОГРОМНОЕ!!!) количество программ не могут справиться с пробелами в путях.
+    Иногда кавычки спасают, как здесь, но полагаться на это не стоит. Кроме того, зачастую эти же программы не могут переварить кириллицу в путях.
+    
+    <p><b><i>При создании проектов выбирайте путь без кириллицы и пробелов!</i></b></p>
+    С этого момента наша игра больше не «epic». Оставим её как <code>game.elf</code> для простоты.
+
+      Структура проекта сейчас выглядит как-то так:<br>
+      <!-- Graphics: (📁📄🧾📝📜🔧📦💾│├└─)  -->
+<pre>
+📁 project
+ ├📄 main.cpp
+ ├📄 Entity.cpp
+ ├📄 Collision.cpp
+ ├...
+ └📜 Makefile</pre>
+    Теперь вместо стены текста проект собирается простым <code>$ make all</code> в папке с проектом. Мейкфайлы могут быть более навороченными:
+<pre class="proglist"><i><b><u>«/project/Makefile»</u></b></i>
+CC=g++
+CFLAGS=-O3 -Wall -c
+OUTPUT=game.elf
+
+all: $(OUTPUT)
+
+$(OUTPUT): main.o Entity.o Collision.o
+    $(CC) main.o Entity.o Collision.o -o $(OUTPUT)
+
+main.o: mainc.cpp
+    $(CC) $(CFLAGS) main.cpp
+
+Entity.o: Entity.cpp
+    $(CC) $(CFLAGS) Entity.cpp
+
+Collision.o: Collision.cpp
+    $(CC) $(CFLAGS) Collision.cpp
+
+clean:
+    rm -rf *.o $(OUTPUT)</pre>
+    Это уже выглядит страшнее (я даже не уверен, что оно будет работать, т.к. писал их раза два в жизни).
+    </p>
+    <p><i>— А зачем цель «clean»?</i></p>
+    <p>
+      Иногда, во время сборки, часть объектных файлов (.o), в которые собираются наши исходники, может оказаться устаревшей или несовместимой с другими объектными файлами, а make по какой-то
+      причине этого не заметил. Данная проблема встречается и в IDE, абсолютного спасения от неё нет. В случаях, когда ваш проект ведёт себя крайне странно, попробуйте вызвать make clean, чтобы
+      удалить все старые объектные файлы. При последующей сборке все файлы кода будут собраны заново, что, вероятно, решит проблему. Например, когда мы в институте писали драйвер для двигателя,
+      в какой-то момент у нас <i>начала менять яркость экрана</i> от ПЛК, и мы минут 20 пытались понять, что идёт не так, пока не решили пересобрать весь проект заново.
+    </p>
+
+
+
+    <h3 id="workspace-setup_cmake">CMake</h3>
+    <p>
+      Главная проблема Makefile заключается в том, что он под Linux и его инструкции невозможно перенести без проблем. Для Windows придётся искать замену и переделывать
+      команды (вместо <code>rm -rf *.o</code> был бы <code>DEL /F *.o</code>).
+      Кросс-платформенных решений довольно много, на самом деле, но популярность диктует выбор, а значит придётся брать <a href="https://cmake.org/">CMake</a>. Для Windows есть
+      установщик, для MSYS2 и Linux есть пакеты в пакетных менеджерах почти всегда. Проблема может возникнуть только с версией. Работа с CMake будет в <a href="#first-program">первой программе</a>.
+    </p>
+
+
+
+    <h3 id="first-program">Первая программа (Hello World без std::cout)</h3>
+    <p>
+      Настало время что-то всё-таки написать. Сделаем простую программу, которая будет выводить «Hello, World!» в консоль. Накидаем файликов в папку проекта:<br>
+<pre>
+📁 first-project
+ ├📁 src
+ │ └📄 main.cpp
+ └📜 CMakeLists.txt</pre>
+      Заранее озадачимся тем, чтобы код приложения был отдельно от файлов сборки.
+    </p>
+<pre class="proglist"><i><b><u>«/first-project/src/main.cpp»</u></b></i>
+#include &lt;print&gt;
+
+int main() {
+  std::println("Hello, World!");
+  return 0;
+}</pre>
+    <p>
+      На самом деле здесь всё просто. В первой строке, через решётку (#) используется <i>директива препроцессора</i>, в данном случае «include». Это самая распространённая и необходимая директива в C/C++. 
+      Всё, что она делает — вставляет содержимое указанного файла на место её вызова, т.е. в процессе сборки данная конструкция развернётся и превратится в содержание
+      файла «.../print», где-то в стандартных библиотеках C++. Например, на моём домашнем ПК с Visual Studio 2022 данный файл
+      находится в <code>C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.43.34808\include\print</code>.
+      Те, кто учил C++, могли ожидать здесь страшную конструкцию <code>std::cout &lt;&lt; "Hello, World!" &lt;&lt; std::endl;</code>, но не стоит беспокоиться — данный ужас теперь
+      в изгнании из уроков по плюсам на ближайшие лет пять точно. <code>std::print</code> может почти всё, что может <code>std::cout</code>, но пользоваться им куда удобнее.
+      Содержание разберём после того, как успешно соберём программу, а для этого нужно написать инструкцию для CMake:
+    </p>
+
+<pre class="proglist"><i><b><u>«/first-project/CMakeLists.txt»</u></b></i>
+cmake_minimum_required(VERSION 4.0)
+
+# Static linking of vcruntime
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$&lt;$&lt;CONFIG:Debug&gt;:Debug&gt;")
+
+# Put libs together with executables
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$&lt;CONFIG&gt;")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$&lt;CONFIG&gt;")
+
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+
+project(first-project LANGUAGES CXX
+    VERSION 0.0.0.1
+    DESCRIPTION "Our first project."
+    HOMEPAGE_URL "https://github.com/VerMishelb/CppCmakeGit-learning-minefield/tree/master/tutorial-from-neocities/first-project"
+)
+add_compile_options(
+    "$<$<C_COMPILER_ID:MSVC>:/utf-8>"
+    "$<$<CXX_COMPILER_ID:MSVC>:/utf-8>"
+)
+
+# TARGETS
+# first-program
+add_executable(first-program src/main.cpp)
+target_include_directories(first-program PUBLIC src)
+</pre>
+<p>
+  <i>??!</i>
+</p>
+<p>
+  Давайте разберём, что здесь вообще происходит, двигаясь сверху вниз, обозначив основные единицы синтаксиса.<br>
+  <ul>
+    <li>В <code>snake_case</code> обычно пишутся функции (<code>add_compile_options()</code>, <code>set()</code>, <code>if()</code>).</li>
+    <li><code>ПРОПИСНЫМИ</code> пишутся переменные и свойства.</li>
+    <li>Комментарии начинаются с <code># решётки</code>.<br>
+    Многострочные начинаются с <code>#[=[</code> и заканчиваются на <code>]=]</code>.
+    Количество <code>=</code> может быть любым, включая 0, но открывающая и закрывающая последовательности должны совпадать по количеству знаков.</li>
+    <li>Переменные используются с помощью <code>${ТАКОГО}</code> синтаксиса.</li>
+    <li>Всё, что выглядит <code>$&lt;ТАК&gt;</code> или <code>$&lt;ВОТ:ТАК&gt;</code> — выражение генератора CMake.</li>
+  </ul>
+  Сам CMake во многих местах на регистр букв не смотрит, поэтому ничто не мешает написать <code>ADD_PROJECT()</code>. Для читаемости лучше так не делать.
+</p>
+<p>
+  <b><code>cmake_minimum_required(VERSION 4.0)</code></b><br>
+    Данная строка должна быть в корневом CMakeLists.txt проекта, т.е.
+    тот «лист» (будем так их называть), который вы находите первым, когда открываете папку с проектом.
+    Она задаёт минимальную поддерживаемую версию CMake, на которой может быть собран этот проект.
+    Часто проекты не используют самые новые функции CMake, из-за чего можно обойтись версией постарше, повысив совместимость.<br>
+</p>
+<p>
+  <b><code>set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$&lt;$&lt;CONFIG:Debug&gt;:Debug&gt;")</code></b><br>
+  <ul>
+    <li><code>set(<i>ПЕРЕМЕННАЯ ЗНАЧЕНИЕ</i>)</code> создаёт переменную, если её ещё нет и задаёт ей значение.</li>
+    <li><code>CMAKE_MSVC_RUNTIME_LIBRARY</code> — одна из стандартных переменных CMake, которая задаёт параметры для среды исполнения MSVC, точнее для того, с чем вы, 
+  как пользователь, сталкивались под названием «vcredist».
+  Библиотека среды исполнения может быть в одном из четырёх видов: <code>MultiThreaded</code>, <code>MultiThreadedDll</code> и ещё два таких же, но отладочных.
+  Отличие значений с суффиксом Dll в том, что приложение будет использовать системные *.dll файлы среды исполнения вместо того, чтобы привязать их статически.
+  Это уменьшает вес исполняемого файла, но без установки vcredist запустить его не получится.</li>
+    <li><code>MultiThreaded$&lt;$&lt;CONFIG:Debug&gt;:Debug&gt;</code> — значение для переменной.
+  Первая часть <code>MultiThreaded</code> простой текст, а <code>$&lt;$&lt;CONFIG:Debug&gt;:Debug&gt;</code> — «выражение генератора» CMake.
+  <code>$&lt;CONFIG&gt;</code> — специальное выражение генератора, которое превращается в Debug, Release, RelWithDebInfo или MinSizeRel в зависимости от собираемой конфигурации
+  (перечислены стандартные, но могут быть и свои).<br>
+  Суть в том, что <code>$&lt;CONFIG:Debug&gt;</code> становится <code>1</code> при сборке конфигурации <code>Debug</code>.
+  Дальше полученное значение используется в другом выражении <code>$&lt;$&lt;CONFIG:Debug&gt;:Debug&gt;</code>, которое принимает (текстовое)
+  значение <code>Debug</code>, если конструкция в левой части выражения равна <code>1</code>.<br>
+  Получается, что в зависимости от конфигурации задаётся значение <code>MultiThreaded</code> или <code>MultiThreadedDebug</code>.</li>
+  </ul>
+  Целиком вся эта конструкция <b>статически привязывает библиотеку среды исполнения MSVC к исполняемым файлам</b>, чтобы изделие запускалось без установки 
+  дополнительных компонентов системы. Если вам это не кажется серьёзной проблемой, задумайтесь над тем, что на моей текущей системе 
+  (установлена весной 2023 года) стоит уже 15 разных версий Microsoft Visual C++ Redistributable, от 2005 года до 2022. Весят они, конечно, мало, но каждая
+  ставилась отдельно.
+</p>
+<p>
+  <b><code>set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$&lt;CONFIG&gt;")</code></b><br>
+  <b><code>set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$&lt;CONFIG&gt;")</code></b><br>
+  <code>CMAKE_RUNTIME/LIBRARY_OUTPUT_DIRECTORY</code> — куда класть результаты сборок приложений (.exe, .elf) и библиотек (.dll, .so).<br>
+  
+  Задаются вручную, потому что
+  при использовании, скажем, SDL, без этих переменных проект библиотеки и проект приложения соберутся в разных директориях, а значит исполняемый файл не найдёт рядом с собой
+  какую-нибудь dll-ку (если вы, конечно, не связали их статически, что не всегда возможно).<br>
+  Ninja Multi-Config, MSVC и прочие системы сборки, которые используют конфигурации, будут создавать свои подпапки. Их можно остановить, обернув значение переменной в 
+  выражение генератора:
+  <code>$&lt;1:"${CMAKE_BINARY_DIR}/$&lt;CONFIG&gt;"&gt;</code> (1 здесь как <code>TRUE</code>).
+</p>
+<p>
+  <b><code>set(CMAKE_CXX_STANDARD 23)</code></b><br>
+  <b><code>set(CMAKE_CXX_STANDARD_REQUIRED TRUE)</code></b><br>
+  <code>CMAKE_CXX_STANDARD</code> задаёт стандарт C++ для использования, а <code>_REQUIRED</code> просит без этого стандарта даже не пытаться собирать проект. Просит 
+  вроде как глобально, <i>НО!</i> Поскольку наш проект использует один и тот же стандарт языка для всех файлов
+  с кодом, а в случае написании библиотеки этот лист перестанет быть верхним уровнем, следовательно не повлияет на включающий проект, ничего страшного здесь нет.
+  Да и наш проект — не библиотека.
+</p>
+<p>
+  <b><code><pre>
+project(first-project LANGUAGES CXX
+    VERSION 0.0.0.1
+    DESCRIPTION "Our first project."
+    HOMEPAGE_URL "https://github.com/VerMishelb/CppCmakeGit-learning-minefield/tree/master/tutorial-from-neocities/first-project"
+)</pre></code></b>
+  <ul>
+    <li><code>project()</code> — команда для создания проекта. В каждом проекте должна быть одна.
+      От него всё отсчитывается. Формально, это допускает существование вложенных проектов в пределах одного большого, но на практике я такого не видел.</li>
+    <li><code>LANGUAGES</code> — после этого слова задаются языки программирования, через пробел. В нашем проекте только плюсы, поэтому здесь <code>CXX</code>.</li>
+    <li><code>VERSION</code> — версия проекта. Примечательно, что версия есть только для проекта, но не для исполняемых файлов, добавляемых отдельно. Странная система.</li>
+    <li><code>DESCRIPTION</code> — описание проекта.</li>
+    <li><code>HOMEPAGE_URL</code> — домашняя страница проекта.</li>
+  </ul>
+  Формально, здесь можно обойтись и <code>project(first-project)</code>, но мне хотелось показать, каким образом можно задавать свойства, указанные как опциональные аргументы
+  в документации CMake.
+</p>
+<p>
+  <b><code><pre>
+add_compile_options(
+    "$&lt;$&lt;C_COMPILER_ID:MSVC&gt;:/utf-8&gt;"
+    "$&lt;$&lt;CXX_COMPILER_ID:MSVC&gt;:/utf-8&gt;"
+)</pre></code></b>
+<code>add_compile_options()</code> устанавливает (точнее, добавляет к существующим) флаги для компилятора по умолчанию. Здесь используется уже знакомая нам конструкция с условием через выражение генератора, чтобы
+задать флаг <code>/utf-8</code>, если сборка производится компилятором MSVC, потому что по умолчанию он почему-то использует системную кодировку (1251).
+</p>
+<p>
+  <b><code>add_executable(first-program src/main.cpp)</code></b><br>
+  Добавляет в проект новую цель в виде исполняемого файла, т.е. для Windows это будет first-program.exe (расширение он сам при сборке додумает). После указания названия цели перечисляются файлы кода для сборки.  
+</p>
+<p>
+  <b><code>target_include_directories(first-program PUBLIC src)</code></b><br>
+  Команда добавляет к цели директории, в которых можно искать заголовочные файлы (.h, .hpp).<br>
+  <code>first-program</code> — цель.<br>
+  <code>PUBLIC</code> контролирует видимость того, что мы делаем командой.
+  В данном случае контролирует то, будут ли другие проекты, использующие наш как библиотеку, видеть папку src как папку с заголовочными файлами.
+  Бывает <code>PRIVATE</code> (нужно включить директорию для сборки цели, но другим целям она не нужна), <code>INTERFACE</code> (не нужна для сборки, но нужна другим проектам (например, интерфейс взаимодействия с библиотекой, вынесенный в отдельные заголовочные файлы)) и
+  <code>PUBLIC</code> (нужно дать доступ всем).<br>
+  <code>src</code> здесь директория, в которой мы ищем файлы. Формально это папка с кодом (.cpp), но когда заголовочный файл не нужен другим проектам, мне удобнее оставить его в <code>src</code>.
+</p>
+<p>
+  Теперь, если в VSC открыта корневая папка с CMakeLists.txt, расширение увидит тип проекта и предложит выбрать компилятор:
+  <div style="text-align: center;">
+    <img src="/files/cpp/vsc_compilers.png" width=591 height=190>
+  </div>
+  Перед тем, как идти собирать проект, нужно открыть настройки VSC, найти там пункт
+  <code>cmake.outputLogEncoding</code> и задать ему значение <code>utf8</code>, чтобы в консоли можно было прочитать ошибки при сборке.
+</p>
+<p>
+  В случае успеха при сохранении CMakeLists.txt, либо при выполнении «настройки» проекта ('configure'),
+  <div style="text-align: center;">
+    <img src="/files/cpp/vsc_configure.png" width=345 height=440>
+  </div>
+  в консоли внизу должен появиться подобный вывод:
+  <pre class="proglist">
+[main] Настройка проекта: first-project 
+[proc] Выполнение команды: "C:\Program Files\CMake\bin\cmake.EXE" -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE --no-warn-unused-cli 
+-S E:/VSProjects/CppCmakeGit-learning-minefield/tutorial-from-neocities/first-project 
+-B e:/VSProjects/CppCmakeGit-learning-minefield/tutorial-from-neocities/first-project/build -G "Visual Studio 17 2022" -T host=x64 -A x64
+[cmake] Not searching for unused variables given on the command line.
+[cmake] -- Selecting Windows SDK version 10.0.22000.0 to target Windows 10.0.19045.
+[cmake] -- The CXX compiler identification is MSVC 19.43.34810.0
+[cmake] -- Detecting CXX compiler ABI info
+[cmake] -- Detecting CXX compiler ABI info - done
+[cmake] -- Check for working CXX compiler: C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.43.34808/bin/Hostx64/x64/cl.exe - skipped
+[cmake] -- Detecting CXX compile features
+[cmake] -- Detecting CXX compile features - done
+[cmake] -- Configuring done (3.1s)
+[cmake] -- Generating done (0.0s)
+[cmake] -- Build files have been written to: E:/VSProjects/CppCmakeGit-learning-minefield/tutorial-from-neocities/first-project/build</pre>
+    Но это в том случае, если вы собираетесь использовать VSCode. А без него придётся заниматься этим вручную, либо написать несколько скриптов:
+<pre class="proglist"><b><i><u>configure.bat</u></i></b>
+cmake -S . -B build -D CMAKE_BUILD_TYPE=Release
+</pre>
+    <code>-S</code> указывает директорию исходников (где лежит главный лист с <code>project</code>). Раз скрипт лежит в той папке, которая нам нужна, просто указываем точкой текущую директорию.<br>
+    <code>-B</code> указывает директорию, где будут расположены файлы системы сборки (они — результат конфигурирования проекта). Если вы используете Git, эту папку стоит добавить в <code>.gitignore</code>.<br>
+    <code>-D</code> задаёт значение переменной CMake. Если ещё точнее, то запись в кэше. Пробел между <code>-D</code> и названием переменной опционален.<br>
+    Помимо этих есть ещё <code>-G</code>, <code>-A</code>, <code>-T</code> и прочие, про которые лучше читать в <a href=https://cmake.org/cmake/help/latest/manual/cmake.1.html#options>документации</a>.
+<pre class="proglist"><b><i><u>build.bat</u></i></b>
+cmake --build build --config Release -j
+</pre>
+    У CMake есть режим сборки, который освобождает вас от необходимости разбираться с системой сборки, которая используется.<br>
+    После <code>--build</code> указывается папка с файлами системы сборки (<code>-B</code> из прошлой команды).<br>
+    <code>--config</code> задаёт тип сборки, если система поддерживает несколько конфигураций (MSVC, Ninja Multi-Config).
+    Если не поддерживает, тип задаётся на этапе конфигурирования проекта с помощью CMAKE_BUILD_TYPE (см. выше).<br>
+    <code>-j</code> без параметров просит CMake всё-таки использовать 24 потока моего процессора вместо одного. Если после -j написать число, будет использовано заданное кол-во потоков.
+<pre class="proglist"><b><i><u>clean.bat</u></i></b>
+cmake --build build --target clean
+</pre>
+    Сборка цели <code>clean</code> очищает проект от артефактов сборки. Я уже писал вышел про экран ПЛК. С другой стороны, ничто не мешает удалить всю папку <code>build</code> и собрать её заново.
+</p>
+<p>
+  Всё. Выполнение конфигурирования и сборки создаёт исполняемый файл <code>first-project\build\Release\first-program.exe</code>, при выполнении которого в консоль выводится сообщение.
+  Если сборка производилась из VSCode, скорее всего, вместо <code>Release</code> будет <code>Debug</code>, если только вы сами не поменяли тип сборки.
+</p>
+
+
+
+    <footer>
+      <div style="text-align: center;">
+          <small>
+              © 2025-2026 VerMishelb.
+          </small>
+      </div>
+    </footer>
+    <!-- This is necessary because the mobile version of Firefox CANNOT EVEN SCROLL HERE for some reason. -->
+    <br>
+  </body>
+</html>
