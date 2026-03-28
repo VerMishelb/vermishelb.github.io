@@ -165,6 +165,7 @@ start explorer.exe</code></pre>
 <pre><code>Get-Module PSReadLine | fl name,path
 Remove-Module PSReadLine
 Remove-Item "C:\Program Files\WindowsPowerShell\Modules\PSReadLine\*" -Recurse -Force
+Install-Module PSReadLine -Repository PSGallery -Force
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned</code></pre>
 
 <br><br><br>
