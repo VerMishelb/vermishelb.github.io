@@ -76,6 +76,12 @@ start explorer.exe</code></pre>
     Use <a href="https://github.com/saschanaz/jxl-winthumb">this epic thing</a>. The instructions are simple enough, but in case they are gone somehow, just call a regsvr32 on it as Admin.
     </p>
 
+    <h3>Fix PowerShell not processing capital letters</h3>
+<pre><code>Get-Module PSReadLine | fl name,path
+Remove-Module PSReadLine
+Remove-Item "C:\Program Files\WindowsPowerShell\Modules\PSReadLine\*" -Recurse -Force
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned</code></pre>
+
 <br><br><br>
     <h2>Linux</h2>
     <h3>Discord update script for Debian</h3>

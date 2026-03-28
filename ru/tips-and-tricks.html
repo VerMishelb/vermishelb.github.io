@@ -161,6 +161,12 @@ start explorer.exe</code></pre>
     Используйте <a href="https://github.com/saschanaz/jxl-winthumb">вот эту крутую штуку</a>. Инструкция довольно простая, но, на случай, если она пропадёт, просто вызовите regsvr32 с тамошней .dll от имени администратора.
     </p>
 
+    <h3>PowerShell съедает заглавные буквы</h3>
+<pre><code>Get-Module PSReadLine | fl name,path
+Remove-Module PSReadLine
+Remove-Item "C:\Program Files\WindowsPowerShell\Modules\PSReadLine\*" -Recurse -Force
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned</code></pre>
+
 <br><br><br>
     <h2>Linux</h2>
     <h3>Скрипт для обновления Discord в Debian</h3>
