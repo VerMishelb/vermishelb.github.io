@@ -19,5 +19,6 @@ body {
 	background: #f0f0f0;
 	border-radius: 4px;
 	box-shadow: 2px 2px 4px #C0C0C0;
-	font: 500 100% monospace; 
+	/* font: 500 100% monospace; */
+	font: 500 90% "Courier New", monospace; 
 }
